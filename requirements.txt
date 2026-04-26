@@ -1,0 +1,27 @@
+# Data ingestion and processing
+pandas==2.2.0
+numpy==1.24.3
+boto3==1.26.137
+
+# Snowflake
+snowflake-connector-python==3.2.0
+snowflake-sqlalchemy==1.5.1
+
+# DBT
+dbt-core==1.5.0
+dbt-snowflake==1.5.0
+
+# Airflow
+apache-airflow==2.8.0
+apache-airflow-providers-snowflake==4.3.0
+apache-airflow-providers-amazon==7.7.0
+
+# Utilities
+python-dotenv==1.0.0
+pyyaml==6.0
+pytz==2024.1
+
+# Development
+pytest==7.3.1
+black==23.3.0
+flake8==6.0.0
