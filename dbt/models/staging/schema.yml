@@ -1,0 +1,138 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw data from S3 ingestion
+    database: demo_db
+    schema: raw
+    tables:
+      - name: customers
+        description: Customer master data
+        columns:
+          - name: customer_id
+            description: Unique customer identifier
+            tests:
+              - not_null
+              - unique
+          - name: email
+            description: Customer email
+            tests:
+              - unique
+      
+      - name: products
+        description: Product master data
+        columns:
+          - name: product_id
+            description: Unique product identifier
+            tests:
+              - not_null
+              - unique
+          - name: price
+            description: Product price
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+      
+      - name: orders
+        description: Order transaction data
+        columns:
+          - name: order_id
+            description: Unique order identifier
+            tests:
+              - not_null
+              - unique
+          - name: customer_id
+            description: Foreign key to customer
+            tests:
+              - relationships:
+                  to: source('raw', 'customers')
+                  field: customer_id
+          - name: amount
+            description: Order amount
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+models:
+  - name: stg_customers
+    description: Cleaned customer data
+    columns:
+      - name: id
+        description: Customer ID
+        tests:
+          - not_null
+          - unique
+      - name: name
+        description: Customer name
+        tests:
+          - not_null
+      - name: email
+        description: Email address
+        tests:
+          - unique
+
+  - name: stg_products
+    description: Cleaned product data
+    columns:
+      - name: product_id
+        description: Product ID
+        tests:
+          - not_null
+          - unique
+      - name: price
+        description: Product price
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+  - name: stg_orders
+    description: Cleaned order data
+    columns:
+      - name: order_id
+        description: Order ID
+        tests:
+          - not_null
+          - unique
+
+  - name: gold_dim_customers
+    description: Customer dimension for BI dashboards
+    columns:
+      - name: customer_key
+        description: Surrogate key
+        tests:
+          - not_null
+          - unique
+      - name: customer_segment
+        description: Customer segment (VIP/Regular/Active/Inactive)
+        tests:
+          - accepted_values:
+              values: ['VIP', 'Regular', 'Active', 'Inactive']
+
+  - name: gold_fact_sales
+    description: Sales fact table
+    columns:
+      - name: sales_key
+        description: Surrogate key
+        tests:
+          - not_null
+          - unique
+
+  - name: gold_summary_daily_sales
+    description: Daily sales summary
+    columns:
+      - name: sales_date
+        description: Sales date
+        tests:
+          - not_null
+          - unique
+
+  - name: gold_product_performance
+    description: Product performance metrics
+    columns:
+      - name: product_id
+        description: Product ID
+        tests:
+          - not_null
+          - unique
