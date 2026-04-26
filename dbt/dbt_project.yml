@@ -1,0 +1,12 @@
+# dbt Project Configuration
+
+name: my_dbt_project
+version: '1.0'
+
+# Define the target database and schema
+profile: my_profile
+source-paths: ["models"]
+target-path: "target"
+
+# Additional configurations
+# ...
